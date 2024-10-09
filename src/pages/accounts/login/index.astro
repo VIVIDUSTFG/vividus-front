@@ -1,0 +1,88 @@
+---
+import { api } from '../../../lib/data';
+import FormSignIn from './_FormSignIn.astro';
+import { db, lucia, userTable, type DatabaseUser } from '../../../auth';
+import LayoutCommon from '../../../app/LayoutCommon.astro';
+
+let errorMap = {
+  username: '',
+  password: '',
+  backend: '',
+};
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+
+  const username = formData.get('username');
+  if (typeof username !== 'string' || username.length < 1) {
+    errorMap.username = 'Please enter a valid username';
+  }
+
+  const password = formData.get('password');
+  if (typeof password !== 'string' || password.length < 1) {
+    errorMap.password = 'Please enter a valid password';
+  }
+
+  const hasErrors = Object.values(errorMap).some((msg) => msg);
+  if (!hasErrors) {
+    const data = new FormData();
+    data.append('username', username as string);
+    data.append('password', password as string);
+    try {
+      const loginResponse = await fetch(api('/auth/login'), {
+        method: 'POST',
+        body: formData,
+      });
+      if (loginResponse.ok) {
+        const user = (await loginResponse.json()) as DatabaseUser;
+        try {
+          db.insert(userTable)
+            .values({
+              id: user.id,
+              username: user.username,
+              role: user.role,
+              access_token: user.access_token,
+              refresh_token: user.refresh_token,
+            })
+            .onConflictDoUpdate({
+              target: userTable.id,
+              set: {
+                username: user.username,
+                role: user.role,
+                access_token: user.access_token,
+                refresh_token: user.refresh_token,
+              },
+            })
+            .run();
+          const session = await lucia.createSession(user.id, {});
+          const sessionCookie = lucia.createSessionCookie(session.id);
+          Astro.cookies.set(
+            sessionCookie.name,
+            sessionCookie.value,
+            sessionCookie.attributes
+          );
+          return new Response(null, {
+            status: 302,
+            headers: {
+              Location: '/',
+            },
+          });
+        } catch (error) {
+          console.log(error);
+          errorMap.backend = 'There was an error logging in. Please try again.';
+        }
+      } else {
+        errorMap.backend = (await loginResponse.json()).detail as string;
+      }
+    } catch (error) {
+      errorMap.backend = 'There was an error logging in. Please try again.';
+    }
+  }
+}
+---
+
+<LayoutCommon>
+  <div class="min-h-screen align-middle flex pb-[12vh]">
+    <FormSignIn errorMap={errorMap} />
+  </div>
+</LayoutCommon>

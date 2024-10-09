@@ -1,0 +1,26 @@
+---
+import InfoHeader from './_components/InfoHeader.astro';
+import InputForm from './_components/InputForm.astro';
+import SubmissionInfo from './_components/SubmissionInfo.astro';
+
+/* eslint max-lines: 'off' */
+
+const { submissions } = Astro.props;
+
+let submission = {
+  title: 'Submission Title',
+  description: 'Submission Description',
+};
+---
+
+<div class="px-4 pt-6">
+  <InfoHeader />
+
+  <InputForm submissions={submissions} />
+
+  <!-- <div id="content-below-form">
+    <SubmissionInfo submission={submission} />
+  </div> -->
+</div>
+
+<div id="loading-screen"></div>

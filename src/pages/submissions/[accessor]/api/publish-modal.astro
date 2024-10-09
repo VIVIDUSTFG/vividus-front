@@ -1,0 +1,17 @@
+---
+import PublishModal from '../_components/PublishModal.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get('id');
+const accessor = url.searchParams.get('accessor');
+
+if (!id || !accessor) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+---
+
+<PublishModal id={id} accessor={accessor} />

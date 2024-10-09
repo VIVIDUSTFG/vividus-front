@@ -1,0 +1,31 @@
+---
+import LayoutSidebar from '../../../app/LayoutSidebar.astro';
+import Model from './_Model.astro';
+import { getSubmissionDetails } from '../../../services';
+
+const { accessor } = Astro.params;
+
+let submission = null;
+
+try {
+  const response = await getSubmissionDetails(
+    Astro.locals.user.access_token,
+    accessor!!
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      submission = body;
+    }
+  } else {
+    return new Response(null, { status: 404 });
+  }
+} catch (error) {
+  return new Response(null, { status: 500 });
+}
+---
+
+<LayoutSidebar>
+  <Model submission={submission} />
+</LayoutSidebar>

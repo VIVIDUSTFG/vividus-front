@@ -1,0 +1,30 @@
+---
+/* eslint max-lines: 'off' */
+
+import { url } from '../../../lib/data';
+import InfoHeader from './_components/InfoHeader.astro';
+import RankingTable from './_components/RankingTable.astro';
+
+const { dataset } = Astro.props;
+---
+
+<div class="px-4 pt-6">
+  <div class="grid gap-4 grid-cols-1">
+    <InfoHeader dataset={dataset} />
+  </div>
+  <div class="grid gap-4 mt-4 grid-cols-1">
+    <div
+      class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+    >
+      <!-- NOTE: Charts could be extracted to a generic UI component -->
+      <div data-dataset-id={dataset.id} id="main-chart"></div>
+    </div>
+  </div>
+  <div class="grid gap-4 mt-4 grid-cols-1">
+    <RankingTable datasetId={dataset.id} />
+  </div>
+</div>
+
+<script>
+  import './_Dataset.client';
+</script>

@@ -1,0 +1,11 @@
+---
+import LayoutCommon from '../../../app/LayoutCommon.astro';
+import SubmissionError from './_SubmissionError.astro';
+
+const url = new URL(Astro.request.url);
+const workflow = url.searchParams.get('workflow');
+---
+
+<LayoutCommon>
+  <SubmissionError workflow={workflow} />
+</LayoutCommon>

@@ -1,0 +1,16 @@
+---
+import DeleteModal from '../_components/DeleteModal.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const submissionAccessor = url.searchParams.get('submission-accessor');
+
+if (!submissionAccessor) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+---
+
+<DeleteModal submissionAccessor={submissionAccessor} />

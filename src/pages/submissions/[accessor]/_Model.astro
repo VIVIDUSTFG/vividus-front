@@ -1,0 +1,162 @@
+---
+/* eslint max-lines: 'off' */
+
+import HeaderCard from './_components/HeaderCard.astro';
+import RankCard from './_components/RankCard.astro';
+import RadarCard from './_components/RadarCard.astro';
+import RepositoryCard from './_components/RepositoryCard.astro';
+import TagsCard from './_components/TagsCard.astro';
+import MethodsCard from './_components/MethodsCard.astro';
+import ResultsTableCard from './_components/ResultsTableCard.astro';
+import TestTableCard from './_components/TestTableCard.astro';
+import PublishModal from './_components/PublishModal.astro';
+import RevertModal from './_components/RevertModal.astro';
+import { getSubmissionTestRecords } from '../../../services';
+
+const { submission } = Astro.props;
+const { role } = Astro.locals.user;
+
+let testRecords = [];
+
+if (role === 'admin') {
+  const response = await getSubmissionTestRecords(
+    Astro.locals.user.access_token,
+    submission.id
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (body) {
+      testRecords = body;
+    }
+  }
+}
+---
+
+<div
+  id="submission-container"
+  class="px-4 pt-6"
+  data-submission-id={submission.id}
+>
+  <div id="submission-header"><HeaderCard submission={submission} /></div>
+
+  <div class="grid gap-4 mt-4 grid-cols-3">
+    <RankCard submissionId={submission.id} />
+
+    <RadarCard submissionId={submission.id} />
+
+    <div class="grid gap-4 grid-cols-1">
+      <RepositoryCard submission={submission} />
+
+      <TagsCard />
+
+      <MethodsCard />
+    </div>
+  </div>
+  <div class="grid gap-4 mt-4 grid-cols-1">
+    <ResultsTableCard submissionId={submission.id} />
+  </div>
+  {
+    role === 'admin' && (
+      <div id="test-table" class="grid gap-4 mt-4 grid-cols-1">
+        <TestTableCard records={testRecords} submission={submission} />
+      </div>
+    )
+  }
+</div>
+
+<div id="view-modal"></div>
+
+<div
+  id="reload-modal"
+  class="hidden overflow-y-auto overflow-x-hidden justify-end items-end w-full md:inset-0 h-auto max-h-full fixed right-0 bottom-0"
+>
+  <div class="relative p-4 w-full max-w-xs">
+    <!-- Adjusted width for better visibility -->
+    <!-- Modal content -->
+    <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+      <!-- Modal header -->
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600"
+      >
+        <h3
+          class="text-xl text-center font-semibold text-gray-900 dark:text-white"
+        >
+          Submission scores have been updated
+        </h3>
+      </div>
+      <!-- Modal body -->
+      <div class="p-4 md:p-5 space-y-4">
+        <button
+          onclick="location.reload()"
+          type="button"
+          class="text-white w-full bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+        >
+          Reload page
+        </button>
+        <button
+          onclick="document.getElementById('reload-modal').classList.add('hidden')"
+          id="close-reload-modal"
+          type="button"
+          class="w-full bg-white text-gray-900 rounded-lg text-sm px-5 py-2.5 font-medium border border-gray-200 hover:bg-gray-100 hover:text-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { api } from '../../../lib/data';
+
+  let eventSource = null;
+
+  function listenToSubmissionEvents(submissionId) {
+    const eventUrl = api(`/scores/events/${submissionId}`);
+    console.log('Event URL:', eventUrl);
+
+    eventSource = new EventSource(eventUrl);
+
+    eventSource.onopen = function () {
+      console.log('Connection to event stream opened');
+    };
+
+    eventSource.onmessage = function (event) {
+      console.log('Update received: ', event.data);
+      const modalElement = document.getElementById('reload-modal');
+      modalElement.classList.remove('hidden'); // Show modal without overlay
+      modalElement.classList.add('flex'); // Ensure it displays as a flex container
+    };
+
+    eventSource.onerror = function (event) {
+      console.warn('EventSource error occurred:', event);
+      eventSource.close();
+      // Reconnect logic...
+    };
+  }
+
+  // Close EventSource when the page is unloaded
+  window.addEventListener('beforeunload', function () {
+    if (eventSource) {
+      eventSource.close();
+      console.log('EventSource connection closed');
+    }
+  });
+
+  // Initialize the EventSource after checking server health
+  window.addEventListener('load', async function () {
+    let submissionId = null;
+
+    if (document.getElementById('submission-container')) {
+      submissionId = document.getElementById('submission-container').dataset
+        .submissionId;
+
+      listenToSubmissionEvents(submissionId);
+    }
+  });
+</script>
+
+<script>
+  import './_Model.client';
+</script>

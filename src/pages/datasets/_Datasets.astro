@@ -1,0 +1,61 @@
+---
+/* eslint max-lines: 'off' */
+
+import { ur } from '@faker-js/faker';
+import NavPagination from '../../components/NavPagination.astro';
+import { url, fetchData } from '../../lib/data.js';
+import BestPerformingSubmissions from './_components/BestPerformingSubmissions.astro';
+import SectionInfo from './_components/SectionInfo.astro';
+import DatasetsTable from './_components/DatasetsTable.astro';
+---
+
+<div class="px-4 pt-6">
+  <div class="grid gap-4 xl:grid-cols-2">
+    <SectionInfo />
+  </div>
+  <div class="grid gap-4 mt-4 grid-cols-1 xl:grid-cols-5">
+    <div
+      class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm xl:col-span-3 dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+    >
+      <!-- NOTE: Charts could be extracted to a generic UI component -->
+      <div id="main-chart"></div>
+    </div>
+
+    <BestPerformingSubmissions />
+  </div>
+  <div class="grid gap-4 mt-4 grid-cols-1">
+    <DatasetsTable />
+  </div>
+</div>
+
+<script>
+  import './_Datasets.client';
+</script>
+
+<style is:global>
+  /* chart styles */
+  .apexcharts-tooltip {
+    @apply bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-0 rounded-lg shadow-lg !important;
+  }
+
+  .apexcharts-tooltip .apexcharts-tooltip-title {
+    @apply py-2 px-4 bg-gray-100 dark:bg-gray-600 border-b border-gray-200 dark:border-gray-500 !important;
+  }
+
+  .apexcharts-xaxistooltip {
+    @apply text-gray-500 border-0 bg-white dark:bg-gray-700 dark:text-gray-300 rounded-lg shadow-lg !important;
+  }
+
+  .apexcharts-tooltip .apexcharts-tooltip-text-y-value {
+    @apply dark:text-white;
+  }
+
+  .apexcharts-xaxistooltip-text {
+    @apply font-medium text-sm !important;
+  }
+
+  .apexcharts-xaxistooltip:before,
+  .apexcharts-xaxistooltip:after {
+    @apply border-0 !important;
+  }
+</style>

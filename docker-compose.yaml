@@ -1,0 +1,9 @@
+services:
+  astro-app:
+    build: .
+    ports:
+      - "4321:4321"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+      - PROD_URL=http://localhost:4321

@@ -1,0 +1,10 @@
+---
+import ErrorModal from '../_components/ErrorModal.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const statusText = url.searchParams.get('status-text');
+---
+
+<ErrorModal statusText={statusText} />

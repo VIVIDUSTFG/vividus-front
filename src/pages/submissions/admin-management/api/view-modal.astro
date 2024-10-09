@@ -1,0 +1,43 @@
+---
+import ViewModal from '../_components/ViewModal.astro';
+import { getSubmissionDetails } from '../../../../services';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const accessor = url.searchParams.get('accessor');
+
+if (!accessor) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+
+let submission = null;
+
+try {
+  const response = await getSubmissionDetails(
+    Astro.locals.user.access_token,
+    accessor
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      submission = body;
+    }
+  } else {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error fetching data',
+  });
+}
+---
+
+<ViewModal submission={submission} />

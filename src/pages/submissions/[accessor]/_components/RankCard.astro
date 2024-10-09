@@ -1,0 +1,47 @@
+---
+import { getSubmissionRank } from '../../../../services';
+
+const { submissionId } = Astro.props;
+
+let data = null;
+
+if (submissionId) {
+  const response = await getSubmissionRank(
+    Astro.locals.user.access_token,
+    submissionId
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      data = body;
+    }
+  }
+}
+---
+
+<div
+  class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+>
+  <div class="w-full h-full mb-4 lg:mb-0 flex items-center justify-center">
+    <div class="flex flex-col items-center justify-center">
+      <h3 class="text-center text-2xl font-light mb-4">Overall rank</h3>
+      {
+        data && data.rank !== null ? (
+          <>
+            <span class="text-center mb-4 text-9xl font-bold text-primary-800 dark:text-white">
+              # {data.rank}
+            </span>
+            <span class="text-center text-2xl font-extralight">
+              Out of {data.total}
+            </span>{' '}
+          </>
+        ) : (
+          <span class="text-center mb-4 text-xl font-bold text-primary-800 dark:text-white">
+            No data available
+          </span>
+        )
+      }
+    </div>
+  </div>
+</div>

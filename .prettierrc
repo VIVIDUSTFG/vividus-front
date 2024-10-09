@@ -1,0 +1,32 @@
+{
+	"printWidth": 120,
+	"semi": true,
+	"singleQuote": true,
+	"tabWidth": 2,
+	"trailingComma": "es5",
+	"bracketSpacing": true,
+	"importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+	"importOrderSortSpecifiers": true,
+
+	"useTabs": false,
+
+	"plugins": ["prettier-plugin-astro", "@trivago/prettier-plugin-sort-imports"],
+	"overrides": [
+		{
+			"files": "*.astro",
+			"options": {
+				"parser": "astro",
+				"printWidth": 80,
+				"semi": true,
+				"singleQuote": true,
+				"tabWidth": 2,
+				"trailingComma": "es5",
+				"bracketSpacing": true,
+				"importOrder": ["^@core/(.*)$", "^@server/(.*)$", "^@ui/(.*)$", "^[./]"],
+				"importOrderSortSpecifiers": true,
+
+				"useTabs": false
+			}
+		}
+	]
+}

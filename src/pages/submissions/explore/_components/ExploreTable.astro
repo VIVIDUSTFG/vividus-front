@@ -1,0 +1,126 @@
+---
+import { url } from '../../../../lib/data';
+
+const { submissions } = Astro.props;
+---
+
+<div class="grid gap-4">
+  <div
+    class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+  >
+    <!-- Card header -->
+    <div class="items-center lg:flex">
+      <div class="mb-4 lg:mb-0">
+        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+          All submissions
+        </h3>
+        <span class="text-base font-normal text-gray-500 dark:text-gray-400"
+          >This is a list of all the available models</span
+        >
+      </div>
+    </div>
+    <!-- Table -->
+    <div class="flex flex-col mt-6">
+      <div class="overflow-x-auto rounded-lg">
+        <div class="inline-block min-w-full align-middle">
+          <div class="overflow-hidden shadow sm:rounded-lg">
+            <table
+              class="w-full divide-y divide-gray-200 dark:divide-gray-600 table-fixed"
+            >
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Title
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Resources
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Author(s)
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Modality
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800">
+                {
+                  submissions &&
+                    submissions.map((submission) => (
+                      <tr>
+                        <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                          {submission.title}
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 text-wrap">
+                          <a
+                            href={submission.resource_url}
+                            target="_blank"
+                            class="text-primary-800 underline"
+                          >
+                            {submission.resource_title}
+                          </a>
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white text-wrap">
+                          {submission.authors}
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          {submission.modality === 'rgb_only' ? (
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-500">
+                              RGB ONLY
+                            </span>
+                          ) : submission.modality === 'rgb_and_audio' ? (
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-500">
+                              RGB AND AUDIO
+                            </span>
+                          ) : null}
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          <a
+                            href={url(`submissions/${submission.accessor}`)}
+                            class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                          >
+                            <svg
+                              class="w-4 h-4 mr-2"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            View
+                          </a>
+                        </td>
+                      </tr>
+                    ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

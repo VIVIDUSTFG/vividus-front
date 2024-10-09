@@ -1,0 +1,17 @@
+---
+import LayoutSidebar from '../../../app/LayoutSidebar.astro';
+import Management from './_Management.astro';
+
+if (Astro.locals.user.role != 'admin') {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: '/submissions/explore',
+    },
+  });
+}
+---
+
+<LayoutSidebar>
+  <Management />
+</LayoutSidebar>

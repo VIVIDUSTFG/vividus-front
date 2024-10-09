@@ -1,0 +1,102 @@
+---
+import { url } from '../../../lib/data';
+import { getDatasetList } from '../../../services';
+
+let datasets = [];
+
+const response = await getDatasetList(Astro.locals.user.access_token);
+
+if (response.ok) {
+  const body = await response.json();
+  if (response.body) {
+    datasets = body;
+  }
+}
+---
+
+<div
+  class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+>
+  <!-- Card header -->
+  <div class="items-center lg:flex">
+    <div class="mb-4 lg:mb-0">
+      <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+        Datasets
+      </h3>
+      <span class="text-base font-normal text-gray-500 dark:text-gray-400"
+        >This is a list of all the available datasets</span
+      >
+    </div>
+  </div>
+  <!-- Table -->
+  <div class="flex flex-col mt-6">
+    <div class="overflow-x-auto rounded-lg">
+      <div class="inline-block min-w-full align-middle">
+        <div class="overflow-hidden shadow sm:rounded-lg">
+          <table
+            class="w-full divide-y divide-gray-200 dark:divide-gray-600 table-fixed"
+          >
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Title
+                </th>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Description
+                </th>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Best Model
+                </th>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Number of submissions
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800">
+              {
+                datasets.map((dataset) => (
+                  <tr>
+                    <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                      <a href={url(`datasets/${dataset.accessor}`)}>
+                        {dataset.title}
+                      </a>
+                    </td>
+                    <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                      <a href={url(`datasets/${dataset.accessor}`)}>
+                        {dataset.description}
+                      </a>
+                    </td>
+                    <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                      <a
+                        href={url(
+                          `submissions/${dataset.best_submission_accessor}`
+                        )}
+                      >
+                        {dataset.best_submission_title}
+                      </a>
+                    </td>
+                    <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                      {dataset.number_of_submissions}
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

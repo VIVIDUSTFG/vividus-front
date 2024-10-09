@@ -1,0 +1,75 @@
+---
+import { createSubmission, getUserSubmissions } from '../../../../services';
+import SubmissionsTable from '../_components/SubmissionsTable.astro';
+
+export const partial = true;
+
+const formData = await Astro.request.formData();
+
+const title = formData.get('title');
+const modality = formData.get('modality');
+const authors = formData.get('authors');
+const repository_url = formData.get('repository_url');
+const resource_title = formData.get('resource_title');
+const resource_url = formData.get('resource_url');
+const description = formData.get('description');
+
+const formDataObject = {
+  title,
+  modality,
+  authors,
+  repository_url,
+  resource_title,
+  resource_url,
+  description,
+};
+
+try {
+  const response = await createSubmission(
+    Astro.locals.user.access_token,
+    formDataObject
+  );
+
+  if (!response.ok) {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  console.log('Error creating submission', error);
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error creating submission',
+  });
+}
+
+let submissions = [];
+
+try {
+  const response = await getUserSubmissions(
+    Astro.locals.user.access_token,
+    Astro.locals.user.id
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      submissions = body;
+    }
+  } else {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  console.log(error);
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error fetching data',
+  });
+}
+---
+
+<SubmissionsTable submissions={submissions} />

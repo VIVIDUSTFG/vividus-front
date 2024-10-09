@@ -1,0 +1,62 @@
+---
+import { deleteSubmission, getUserSubmissions } from '../../../../services';
+import SubmissionsTable from '../_components/SubmissionsTable.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const submissionAccessor = url.searchParams.get('submission-accessor');
+
+if (!submissionAccessor) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+
+try {
+  const response = await deleteSubmission(
+    Astro.locals.user.access_token,
+    submissionAccessor
+  );
+
+  if (!response.ok) {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error deleting data',
+  });
+}
+
+let submissions = [];
+
+try {
+  const response = await getUserSubmissions(
+    Astro.locals.user.access_token,
+    Astro.locals.user.id
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      submissions = body;
+    }
+  } else {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error fetching data',
+  });
+}
+---
+
+<SubmissionsTable submissions={submissions} />

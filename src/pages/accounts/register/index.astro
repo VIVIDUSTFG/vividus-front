@@ -1,0 +1,67 @@
+---
+import { api } from '../../../lib/data';
+import FormSignUp from './_FormSignUp.astro';
+
+let errorMap = {
+  username: '',
+  email: '',
+  password: '',
+  backend: '',
+};
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+
+  const username = formData.get('username');
+  if (typeof username !== 'string' || username.length < 1) {
+    errorMap.username = 'Please enter a valid username';
+  }
+
+  const password = formData.get('password');
+  const confirmPassword = formData.get('confirm-password');
+  if (typeof password !== 'string' || password.length < 1) {
+    errorMap.password = 'Please enter a valid password';
+  } else if ((password as string) !== (confirmPassword as string)) {
+    errorMap.password = 'Passwords do not match';
+  }
+
+  const email = formData.get('email');
+  if (
+    typeof email !== 'string' ||
+    email.length < 1 ||
+    !/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
+  ) {
+    errorMap.email = 'Please enter a valid email';
+  }
+
+  const hasErrors = Object.values(errorMap).some((msg) => msg);
+  if (!hasErrors) {
+    const registerResponse = await fetch(api('/user'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password,
+      }),
+    });
+
+    if (registerResponse.ok) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: '/accounts/login',
+        },
+      });
+    } else {
+      errorMap.backend = (await registerResponse.json()).detail as string;
+    }
+  }
+}
+---
+
+<div class="min-h-screen align-middle flex pb-[12vh]">
+  <FormSignUp errorMap={errorMap} />
+</div>

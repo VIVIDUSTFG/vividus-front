@@ -1,0 +1,151 @@
+---
+import { url } from '../../../../lib/data';
+
+const { submissions } = Astro.props;
+---
+
+<div class="grid gap-4">
+  <div
+    class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+  >
+    <!-- Card header -->
+    <div class="items-center lg:flex">
+      <div class="mb-4 lg:mb-0">
+        <h3 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">
+          Submissions Management <span class="font-light text-sm">- Admin</span>
+        </h3>
+        <span class="text-base font-normal text-gray-500 dark:text-gray-400"
+          >List of non-published submissions to review and manage</span
+        >
+      </div>
+    </div>
+    <!-- Table -->
+    <div class="flex flex-col mt-6">
+      <div class="overflow-x-auto rounded-lg">
+        <div class="inline-block min-w-full align-middle">
+          <div class="overflow-hidden shadow sm:rounded-lg">
+            <table
+              class="w-full divide-y divide-gray-200 dark:divide-gray-600 table-fixed"
+            >
+              <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Title
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    User
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white dark:bg-gray-800">
+                {
+                  submissions &&
+                    submissions.map((submission) => (
+                      <tr>
+                        <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                          {submission.title}
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400 text-wrap">
+                          {submission.user.username}
+                        </td>
+                        <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">
+                          {submission.status === 'draft' ? (
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-gray-400 border border-gray-100 dark:border-gray-500">
+                              DRAFT
+                            </span>
+                          ) : submission.status === 'in_review' ? (
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-yellow-700 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-500">
+                              IN REVIEW
+                            </span>
+                          ) : submission.status === 'request_for_changes' ? (
+                            <span class="bg-purple-100 text-purple-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-500">
+                              REQUEST FOR CHANGES
+                            </span>
+                          ) : submission.status === 'accepted' ? (
+                            <span class="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-gray-700 dark:text-green-400 border border-green-100 dark:border-green-500">
+                              ACCEPTED
+                            </span>
+                          ) : submission.status === 'rejected' ? (
+                            <span class="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-red-700 dark:text-red-400 border border-red-100 dark:border-red-500">
+                              REJECTED
+                            </span>
+                          ) : submission.status === 'published' ? (
+                            <span class="bg-purple-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-md dark:bg-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-500">
+                              PUBLISHED
+                            </span>
+                          ) : null}
+                        </td>
+                        <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                          {(submission.status === 'accepted' ||
+                            submission.status === 'published') && (
+                            <a
+                              href={url(`submissions/${submission.accessor}`)}
+                              class="inline-flex items-center mr-2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                            >
+                              <svg
+                                class="w-4 h-4 mr-2"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M4.998 7.78C6.729 6.345 9.198 5 12 5c2.802 0 5.27 1.345 7.002 2.78a12.713 12.713 0 0 1 2.096 2.183c.253.344.465.682.618.997.14.286.284.658.284 1.04s-.145.754-.284 1.04a6.6 6.6 0 0 1-.618.997 12.712 12.712 0 0 1-2.096 2.183C17.271 17.655 14.802 19 12 19c-2.802 0-5.27-1.345-7.002-2.78a12.712 12.712 0 0 1-2.096-2.183 6.6 6.6 0 0 1-.618-.997C2.144 12.754 2 12.382 2 12s.145-.754.284-1.04c.153-.315.365-.653.618-.997A12.714 12.714 0 0 1 4.998 7.78ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
+                                  clip-rule="evenodd"
+                                />
+                              </svg>
+                              View
+                            </a>
+                          )}
+                          <button
+                            hx-get={`/submissions/admin-management/api/view-modal?accessor=${submission.accessor}`}
+                            hx-target="#view-modal"
+                            hx-swap="innerHTML"
+                            class="toggle-view-modal inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                          >
+                            <svg
+                              class="w-4 h-4 mr-2"
+                              aria-hidden="true"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                fill-rule="evenodd"
+                                d="M15.514 3.293a1 1 0 0 0-1.415 0L12.151 5.24a.93.93 0 0 1 .056.052l6.5 6.5a.97.97 0 0 1 .052.056L20.707 9.9a1 1 0 0 0 0-1.415l-5.193-5.193ZM7.004 8.27l3.892-1.46 6.293 6.293-1.46 3.893a1 1 0 0 1-.603.591l-9.494 3.355a1 1 0 0 1-.98-.18l6.452-6.453a1 1 0 0 0-1.414-1.414l-6.453 6.452a1 1 0 0 1-.18-.98l3.355-9.494a1 1 0 0 1 .591-.603Z"
+                                clip-rule="evenodd"
+                              />
+                            </svg>
+                            Review
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,122 @@
+---
+import { url } from '../../../lib/data';
+import { getBestSubmissions } from '../../../services';
+
+let bestPerformingSubmissions = [];
+
+const response = await getBestSubmissions(Astro.locals.user.access_token);
+
+if (response.ok) {
+  const body = await response.json();
+  if (response.body) {
+    bestPerformingSubmissions = body;
+  }
+}
+---
+
+<div
+  class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm xl:col-span-2 dark:border-gray-700 sm:p-6 dark:bg-gray-800"
+>
+  <h3
+    class="flex items-center mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+  >
+    Best performing models
+    <button
+      data-popover-target="popover-description"
+      data-popover-placement="bottom-end"
+      type="button"
+      ><svg
+        class="w-4 h-4 ml-2 text-gray-400 hover:text-gray-500"
+        aria-hidden="true"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+        xmlns="http://www.w3.org/2000/svg"
+        ><path
+          fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
+          clip-rule="evenodd"></path></svg
+      ><span class="sr-only">Show information</span></button
+    >
+  </h3>
+  <div
+    data-popover
+    id="popover-description"
+    role="tooltip"
+    class="absolute z-10 invisible inline-block text-sm font-light text-gray-500 transition-opacity duration-300 bg-white border border-gray-200 rounded-lg shadow-sm opacity-0 w-72 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400"
+  >
+    <div class="p-3 space-y-2">
+      <h3 class="font-semibold text-gray-900 dark:text-white">
+        Best overall performing models
+      </h3>
+      <p>
+        the models with the best overall performance are those whose metrics for
+        each of the datasets offer the best overall average of the models
+        present in the system.
+      </p>
+    </div>
+    <div data-popper-arrow></div>
+  </div>
+
+  <!-- Table -->
+  <div class="flex flex-col mt-6">
+    <div class="overflow-x-auto rounded-lg">
+      <div class="inline-block min-w-full align-middle">
+        <div class="overflow-hidden shadow sm:rounded-lg">
+          <table
+            class="w-full divide-y divide-gray-200 dark:divide-gray-600"
+          >
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Rank
+                </th>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Model
+                </th>
+                <th
+                  scope="col"
+                  class="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white"
+                >
+                  Resources
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800">
+              {
+                bestPerformingSubmissions.map((model, index) => (
+                  <tr>
+                    <td class="p-4 text-sm font-normal text-gray-900 whitespace-nowrap dark:text-white">
+                      {index + 1}
+                    </td>
+                    <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">
+                      <a href={url(`submissions/${model.accessor}`)}>
+                        {model.title}
+                      </a>
+                    </td>
+                    <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white text-wrap">
+                      <a
+                        href={model.resource_url}
+                        target="_blank"
+                        class="text-primary-800 underline"
+                      >
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v13H7a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h12M9 3v14m7 0v4"/>
+                          </svg>
+                      </a>
+                    </td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

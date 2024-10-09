@@ -1,0 +1,16 @@
+---
+import SubmitModal from '../_components/SubmitModal.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get('id');
+
+if (!id) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+---
+
+<SubmitModal id={id} />

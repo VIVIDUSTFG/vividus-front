@@ -1,0 +1,17 @@
+---
+import DeleteModal from '../_components/DeleteModal.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const id = url.searchParams.get('id');
+const accessor = url.searchParams.get('accessor');
+
+if (!id || !accessor) {
+  return new Response(null, {
+    status: 500,
+  });
+}
+---
+
+<DeleteModal id={id} accessor={accessor} />

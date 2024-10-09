@@ -1,0 +1,82 @@
+---
+import { getSubmissionTestRecords } from '../../../../services';
+import { getSubmissionDetails } from '../../../../services';
+import { submitEvaluation } from '../../../../services';
+import TestTableCard from '../_components/TestTableCard.astro';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const datasetAccessor = url.searchParams.get('dataset_accessor');
+const submissionAccessor = url.searchParams.get('submission_accessor');
+const submissionId = url.searchParams.get('submission_id');
+
+if (!datasetAccessor || !submissionAccessor || !submissionId) {
+  return new Response(null, {
+    status: 404,
+    statusText: 'Dataset or Submission not found',
+  });
+}
+
+try {
+  const response = await submitEvaluation(
+    Astro.locals.user.access_token,
+    datasetAccessor,
+    submissionAccessor
+  );
+
+  if (!response.ok) {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error submitting evaluation',
+  });
+}
+
+let testRecords = [];
+
+try {
+  const response = await getSubmissionTestRecords(
+    Astro.locals.user.access_token,
+    submissionId
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (body) {
+      testRecords = body;
+    }
+  } else {
+    return new Response(null, { status: 404 });
+  }
+} catch (error) {
+  return new Response(null, { status: 500 });
+}
+
+let submission = null;
+
+try {
+  const response = await getSubmissionDetails(
+    Astro.locals.user.access_token,
+    submissionAccessor
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (body) {
+      submission = body;
+    }
+  } else {
+    return new Response(null, { status: 404 });
+  }
+} catch (error) {
+  return new Response(null, { status: 500 });
+}
+---
+
+<TestTableCard records={testRecords} submission={submission} />

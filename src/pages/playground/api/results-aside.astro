@@ -1,0 +1,44 @@
+---
+import ResultsAside from '../_components/ResultsAside.astro';
+import { getWorkflowResults } from '../../../services';
+
+export const partial = true;
+
+const url = new URL(Astro.request.url);
+const workflow = url.searchParams.get('workflow');
+
+if (!workflow) {
+  return new Response(null, {
+    status: 404,
+  });
+}
+
+let result = null;
+
+try {
+  const response = await getWorkflowResults(
+    Astro.locals.user.access_token,
+    workflow
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      result = body;
+    }
+  } else {
+    return new Response(null, {
+      status: response.status,
+      statusText: response.statusText,
+    });
+  }
+} catch (error) {
+  console.log(error);
+  return new Response(null, {
+    status: 500,
+    statusText: 'Error fetching data',
+  });
+}
+---
+
+<ResultsAside result={result} />

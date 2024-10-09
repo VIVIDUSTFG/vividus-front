@@ -1,0 +1,31 @@
+---
+import LayoutSidebar from '../../../app/LayoutSidebar.astro';
+import { getDatasetDetails } from '../../../services';
+import Dataset from './_Dataset.astro';
+
+const { accessor } = Astro.params;
+
+let dataset = null;
+
+try {
+  const response = await getDatasetDetails(
+    Astro.locals.user.access_token,
+    accessor!!
+  );
+
+  if (response.ok) {
+    const body = await response.json();
+    if (response.body) {
+      dataset = body;
+    }
+  } else {
+    return new Response(null, { status: 404 });
+  }
+} catch (error) {
+  return new Response(null, { status: 500 });
+}
+---
+
+<LayoutSidebar>
+  <Dataset dataset={dataset} />
+</LayoutSidebar>
